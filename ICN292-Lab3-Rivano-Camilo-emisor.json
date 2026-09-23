@@ -1,0 +1,119 @@
+{
+  "name": "ICN292-Lab3-Rivano-Camilo-emisor",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1f37f2d0-6f28-4417-b49b-90bdffdd13e5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad1dfdad-e24a-4bb7-b849-b22a75a6e515",
+              "name": "solicitudes",
+              "value": "[   {     \"id_solicitud\": \"DEV-1115\",     \"sku\": \"AU-210\",     \"unidades\": \"1\",     \"monto\": \"19990\",     \"dias_desde_compra\": \"3\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"cliente1@example.cl\"   },   {     \"id_solicitud\": \"DEV-1116\",     \"sku\": \"TE-330\",     \"unidades\": \"2\",     \"monto\": \"69980\",     \"dias_desde_compra\": \"5\",     \"estado_producto\": \"abierto_sin_uso\",     \"email_cliente\": \"cliente2@example.cl\"   },   {     \"id_solicitud\": \"DEV-1117\",     \"sku\": \"HV-050\",     \"unidades\": \"1\",     \"monto\": \"24990\",     \"dias_desde_compra\": \"12\",     \"estado_producto\": \"con_fallas\",     \"email_cliente\": \"cliente3@example.cl\"   },   {     \"id_solicitud\": \"DEV-1118\",     \"sku\": \"MW-150\",     \"unidades\": \"1\",     \"monto\": \"79990\",     \"dias_desde_compra\": \"4\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"cliente4@example.cl\"   },   {     \"id_solicitud\": \"DEV-1119\",     \"sku\": \"PL-120\",     \"unidades\": \"1\",     \"monto\": \"45990\",     \"dias_desde_compra\": \"25\",     \"estado_producto\": \"danado_por_uso\",     \"email_cliente\": \"cliente5@example.cl\"   },   {     \"id_solicitud\": \"DEV-1120\",     \"sku\": \"AS-260\",     \"unidades\": \"1\",     \"monto\": \"89990\",     \"dias_desde_compra\": \"2\",     \"estado_producto\": \"con_fallas\",     \"email_cliente\": \"cliente6@example.cl\"   },   {     \"id_solicitud\": \"DEV-1121\",     \"sku\": \"LV-330\",     \"unidades\": \"1\",     \"monto\": \"289990\",     \"dias_desde_compra\": \"9\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"cliente7@example.cl\"   },   {     \"id_solicitud\": \"DEV-1122\",     \"sku\": \"PL-120\",     \"unidades\": \"1\",     \"monto\": \"45990\",     \"dias_desde_compra\": \"2\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"cliente8@example.cl\"   },   {     \"id_solicitud\": \"DEV-1123\",     \"sku\": \"AU-210\",     \"unidades\": \"2\",     \"monto\": \"39980\",     \"dias_desde_compra\": \"15\",     \"estado_producto\": \"danado_por_uso\",     \"email_cliente\": \"cliente9@example.cl\"   },   {     \"id_solicitud\": \"DEV-1124\",     \"sku\": \"HV-050\",     \"unidades\": \"2\",     \"monto\": \"49980\",     \"dias_desde_compra\": \"1\",     \"estado_producto\": \"abierto_sin_uso\",     \"email_cliente\": \"cliente10@example.cl\"   },   {     \"id_solicitud\": \"DEV-1125\",     \"sku\": \"TE-330\",     \"unidades\": \"1\",     \"monto\": \"34990\",     \"dias_desde_compra\": \"22\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"cliente11@example.cl\"   },   {     \"id_solicitud\": \"DEV-1126\",     \"sku\": \"MW-150\",     \"unidades\": \"1\",     \"monto\": \"79990\",     \"dias_desde_compra\": \"8\",     \"estado_producto\": \"con_fallas\",     \"email_cliente\": \"cliente12@example.cl\"   },   {     \"id_solicitud\": \"DEV-C01\",     \"sku\": \"CB-010\",     \"unidades\": \"1\",     \"monto\": \"9990\",     \"dias_desde_compra\": \"1\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"control01@example.cl\"   },   {     \"id_solicitud\": \"DEV-C02\",     \"sku\": \"LV-330\",     \"unidades\": \"1\",     \"monto\": \"289990\",     \"dias_desde_compra\": \"2\",     \"estado_producto\": \"sin_abrir\",     \"email_cliente\": \"control02@example.cl\"   },   {     \"id_solicitud\": \"DEV-C03\",     \"sku\": \"MW-150\",     \"unidades\": \"1\",     \"monto\": \"79990\",     \"dias_desde_compra\": \"29\",     \"estado_producto\": \"abierto_sin_uso\",     \"email_cliente\": \"control03@example.cl\"   } ]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        320,
+        32
+      ],
+      "id": "88d8a5c2-1665-4e37-b621-2341a836566f",
+      "name": "DATOS"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "solicitudes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        448,
+        32
+      ],
+      "id": "9b6662f0-4df6-4419-a912-07baa2aeb029",
+      "name": "SEPARAR"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rivanocamilo.app.n8n.cloud/webhook/triage-devoluciones",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"id_solicitud\": \"{{ $json.id_solicitud }}\",\n  \"sku\": \"{{ $json.sku }}\",\n  \"unidades\": \"{{ $json.unidades }}\",\n  \"monto\": \"{{ $json.monto }}\",\n  \"dias_desde_compra\": \"{{ $json.dias_desde_compra }}\",\n  \"estado_producto\": \"{{ $json.estado_producto }}\",\n  \"email_cliente\": \"{{ $json.email_cliente }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        32
+      ],
+      "id": "5ffd6d63-7b88-4972-93d0-fe150c6db996",
+      "name": "ENVIAR_A_TRIAGE"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "DATOS": {
+      "main": [
+        [
+          {
+            "node": "SEPARAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEPARAR": {
+      "main": [
+        [
+          {
+            "node": "ENVIAR_A_TRIAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "DATOS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fe4e5e62-1b84-45cd-b80e-e3cbf182157f",
+  "meta": {
+    "instanceId": "68c232fee98d4d000be1cd21297fbdb8c7727b0d2a8c28c8fd45bf388a3bda27"
+  },
+  "nodeGroups": [],
+  "id": "4qCZ5lcoXUqv8vCy",
+  "tags": []
+}

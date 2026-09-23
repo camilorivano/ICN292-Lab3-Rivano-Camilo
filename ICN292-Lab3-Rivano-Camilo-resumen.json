@@ -1,0 +1,373 @@
+{
+  "name": "ICN292-Lab3-Rivano-Camilo-resumen",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2ba6d787-8974-4c1d-847d-8363b67b03e0",
+      "name": "RESUMEN_DIARIO"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "SGYrqAwdfclR42VY",
+          "mode": "list",
+          "cachedResultName": "registro_devoluciones",
+          "cachedResultUrl": "/projects/jiX6Pz0mvCpGKSNF/datatables/SGYrqAwdfclR42VY"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "fecha",
+              "keyValue": "={{ $now.toISODate() }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ff75d456-bf0d-4e57-b5e8-48446db4d75d",
+      "name": "LEER_REGISTRO"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "ruta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "93557e3a-9792-440e-baeb-f601fb4c53f3",
+      "name": "POR_RUTA"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        192
+      ],
+      "id": "55f811b2-8d1e-4e19-8d2b-84154e6aac14",
+      "name": "TOTAL_DIA"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ecc3268b-b553-4422-8465-56f9c58c0fb9",
+              "leftValue": "={{ $json.ruta }}",
+              "rightValue": "APROBACION",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        336
+      ],
+      "id": "1c2885e3-5070-41e8-aee0-d3a2c91ec4a5",
+      "name": "SOLO_APROBADAS"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        336
+      ],
+      "id": "77098943-54ea-465c-864e-e01570312a8b",
+      "name": "CONTAR_APROBADAS"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "detalle_por_ruta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "70007852-9c6f-41e8-8740-083694797cc0",
+      "name": "AGRUPAR"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b63121a9-4aac-4b6e-a01f-2e36e3afd74f",
+              "name": "fecha",
+              "value": "={{ $now.toISODate() }}",
+              "type": "string"
+            },
+            {
+              "id": "003cae8b-ab8e-4532-ac6e-3a4d3f2eb382",
+              "name": "total_solicitudes",
+              "value": "={{ $('TOTAL_DIA').first().json.count_id_solicitud }}",
+              "type": "number"
+            },
+            {
+              "id": "53397a4f-3d93-474b-801b-b113fa0a7ed1",
+              "name": "monto_total_dia",
+              "value": "={{ $('TOTAL_DIA').first().json.sum_monto }}",
+              "type": "number"
+            },
+            {
+              "id": "f3024520-31fe-45e9-9b02-377ded0b9f92",
+              "name": "aprobadas_automaticas",
+              "value": "={{ $('CONTAR_APROBADAS').first().json.count_id_solicitud }}",
+              "type": "number"
+            },
+            {
+              "id": "15ce5754-a7c5-4b1e-9317-4f3dc78e511b",
+              "name": "tasa_aprobacion_pct",
+              "value": "={{ $('CONTAR_APROBADAS').first().json.count_id_solicitud / $('TOTAL_DIA').first().json.count_id_solicitud * 100 }}",
+              "type": "number"
+            },
+            {
+              "id": "f97ed16a-583c-4618-88ba-d6a8451143d5",
+              "name": "detalle_por_ruta",
+              "value": "={{ $('AGRUPAR').first().json.detalle_por_ruta }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1216,
+        16
+      ],
+      "id": "73a94a94-003a-46ae-93f1-e9ab51b65dce",
+      "name": "MENSAJE"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        864,
+        208
+      ],
+      "id": "67a41094-4cdb-48b4-88d0-a53c6573401c",
+      "name": "ESPERAR_RAMAS"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        208
+      ],
+      "id": "7c2f1635-a48f-48f8-abe2-c027b2ab1ff7",
+      "name": "LIMITAR"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RESUMEN_DIARIO": {
+      "main": [
+        [
+          {
+            "node": "LEER_REGISTRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LEER_REGISTRO": {
+      "main": [
+        [
+          {
+            "node": "POR_RUTA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TOTAL_DIA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SOLO_APROBADAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SOLO_APROBADAS": {
+      "main": [
+        [
+          {
+            "node": "CONTAR_APROBADAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POR_RUTA": {
+      "main": [
+        [
+          {
+            "node": "AGRUPAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGRUPAR": {
+      "main": [
+        [
+          {
+            "node": "ESPERAR_RAMAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOTAL_DIA": {
+      "main": [
+        [
+          {
+            "node": "ESPERAR_RAMAS",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "CONTAR_APROBADAS": {
+      "main": [
+        [
+          {
+            "node": "ESPERAR_RAMAS",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "ESPERAR_RAMAS": {
+      "main": [
+        [
+          {
+            "node": "LIMITAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LIMITAR": {
+      "main": [
+        [
+          {
+            "node": "MENSAJE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "934f1648-6392-42af-a3dc-27af61c21344",
+  "meta": {
+    "instanceId": "68c232fee98d4d000be1cd21297fbdb8c7727b0d2a8c28c8fd45bf388a3bda27"
+  },
+  "nodeGroups": [],
+  "id": "sEb0dlGTQ5dr43GT",
+  "tags": []
+}
